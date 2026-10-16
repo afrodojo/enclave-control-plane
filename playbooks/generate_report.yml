@@ -1,0 +1,19 @@
+---
+- name: Collect Cluster Health Telemetry
+  hosts: enclave
+  gather_facts: yes
+  tasks:
+    - name: Query Service Statuses
+      command: systemctl is-active {{ item }}
+      register: service_status
+      ignore_errors: yes
+      loop:
+        - nginx
+        - ollama
+        - firewalld
+
+    - name: Output JSON Status Artifact
+      delegate_to: localhost
+      copy:
+        content: "{{ ansible_facts | to_nice_json }}"
+        destination: "../reports/telemetry-{{ inventory_hostname }}.json"
