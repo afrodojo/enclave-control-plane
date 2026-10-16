@@ -1,0 +1,25 @@
+name: Sync Research Digest to Hive Website
+
+on:
+  push:
+    paths:
+      - 'docs/research/*.md'
+    branches:
+      - main
+
+jobs:
+  sync-to-hive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Control Plane Repo
+        uses: actions/checkout@v4
+
+      - name: Copy Research Log to Hive Repo
+        uses: dmnemec/copy_file_action@main
+        with:
+          personal_token: ${{ secrets.HIVE_SYNC_TOKEN }}
+          src: 'docs/research/'
+          dst_owner: 'afrodojo'
+          dst_repo_name: 'hive-eds-360'
+          dst_path: 'docs/'
+          commit_message: 'feat(cms): automated enclave research digest sync'
