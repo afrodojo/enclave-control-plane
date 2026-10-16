@@ -1,4 +1,3 @@
-cat << 'EOF' > playbooks/app_deploy.yml
 ---
 - name: Deploy and Harden Application Enclave Services
   hosts: enclave
@@ -45,4 +44,3 @@ cat << 'EOF' > playbooks/app_deploy.yml
         state: enabled
         immediate: yes
       when: inventory_hostname == 'node3'
-EOF
