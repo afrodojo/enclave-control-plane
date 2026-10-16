@@ -10,6 +10,8 @@ import os
 import sys
 import urllib.request
 import urllib.error
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] %(message)s')
 
