@@ -31,42 +31,41 @@ This playbook applies to all human personnel, automated system agents, network t
 
 ## 3. Incident Lifecycle & Containment Workflow
 
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          PHASE 1: DETECTION                             │
-│       • Telemetry Anomaly Detection via soar_watchdog.py               │
-│       • SIEM AU-2 Audit Alerting / Failed Authentication Spikes        │
-└────────────────────────────────────┬────────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         PHASE 2: CONTAINMENT                            │
-│       • Automated Node Isolation on Node 1 Ingress Proxy                │
-│       • Termination of Non-eds-360.com Sessions                        │
-│       • FIPS SSH Transport Lockout to Read-Only Mode                    │
-└────────────────────────────────────┬────────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    PHASE 3: EVIDENCE PRESERVATION                       │
-│       • Execution of siem_au2_dashboard.py Snapshot                     │
-│       • SHA-384 Log Hashing & Transfer to Node 3 Vault                 │
-└────────────────────────────────────┬────────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                     PHASE 4: MEDIA SANITIZATION                         │
-│       • Data Spillage Purge per NIST SP 800-88 Rev. 1 Guidelines        │
-│       • Apricorn Aegis Drive Overwrite / Physical Key Erasure           │
-└────────────────────────────────────┬────────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                   PHASE 5: NOTIFICATION & REPORTING                     │
-│       • CISO Briefing within 1 Hour of Confirmation                     │
-│       • Formal DoD DC3 / FedRAMP PMO / 3PAO Report within 24 Hours      │
-└─────────────────────────────────────────────────────────────────────────┘
-
-
+```text
+ ┌─────────────────────────────────────────────────────────────────────────┐
+ │                         PHASE 1: DETECTION                              │
+ │  • Real-time telemetry anomaly monitoring via `soar_watchdog.py`        │
+ │  • SIEM AU-2 audit threshold alerting & auth spike detection            │
+ └────────────────────────────────────┬────────────────────────────────────┘
+                                      │
+                                      ▼
+ ┌─────────────────────────────────────────────────────────────────────────┐
+ │                         PHASE 2: CONTAINMENT                            │
+ │  • Automated interface isolation via Node 1 Ingress proxy               │
+ │  • Active termination of non-`eds-360.com` domain sessions              │
+ │  • FIPS SSH transport lockout switched to read-only state               │
+ └────────────────────────────────────┬────────────────────────────────────┘
+                                      │
+                                      ▼
+ ┌─────────────────────────────────────────────────────────────────────────┐
+ │                   PHASE 3: EVIDENCE PRESERVATION                        │
+ │  • Instant execution of `siem_au2_dashboard.py` log snapshot            │
+ │  • SHA-384 cryptographic hashing & direct streaming to Node 3 Vault    │
+ └────────────────────────────────────┬────────────────────────────────────┘
+                                      │
+                                      ▼
+ ┌─────────────────────────────────────────────────────────────────────────┐
+ │                     PHASE 4: MEDIA SANITIZATION                         │
+ │  • Data spillage purge executing NIST SP 800-88 Rev. 1 guidelines        │
+ │  • Apricorn Aegis drive keypad reset & cryptographic key erasure        │
+ └────────────────────────────────────┬────────────────────────────────────┘
+                                      │
+                                      ▼
+ ┌─────────────────────────────────────────────────────────────────────────┐
+ │                   PHASE 5: NOTIFICATION & REPORTING                     │
+ │  • Verbal & electronic CISO briefing within 1 hour of confirmation     │
+ │  • Formal reporting to DoD DC3 / FedRAMP PMO / 3PAO within 24 hours     │
+ └─────────────────────────────────────────────────────────────────────────┘
 ---
 
 ## 4. Detailed Incident Response Phases
