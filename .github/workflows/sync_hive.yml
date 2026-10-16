@@ -1,21 +1,21 @@
-name: Sync Research & Drafts to Hive Website
+name: Sync Feeds and Research to Hive Website
 
 on:
   push:
     paths:
       - 'docs/research/*.md'
-      - 'docs/drafts/*.json'
+      - 'docs/feeds/*.json'
     branches:
       - main
 
 jobs:
-  sync-research:
+  sync-all:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Control Plane Repo
         uses: actions/checkout@v4
 
-      - name: Sync Research Logs to Hive Repo
+      - name: Copy Research Logs
         uses: dmnemec/copy_file_action@main
         with:
           personal_token: ${{ secrets.HIVE_SYNC_TOKEN }}
@@ -23,14 +23,14 @@ jobs:
           dst_owner: 'afrodojo'
           dst_repo_name: 'hive-eds-360'
           dst_path: 'docs/'
-          commit_message: 'feat(cms): sync ecosystem research log'
+          commit_message: 'feat(cms): sync research log'
 
-      - name: Sync Staging Drafts to Hive Drafts Queue
+      - name: Copy Dashboard Feeds
         uses: dmnemec/copy_file_action@main
         with:
           personal_token: ${{ secrets.HIVE_SYNC_TOKEN }}
-          src: 'docs/drafts/'
+          src: 'docs/feeds/'
           dst_owner: 'afrodojo'
           dst_repo_name: 'hive-eds-360'
-          dst_path: 'content/drafts/'
-          commit_message: 'feat(cms): sync staging draft to admin queue'
+          dst_path: 'docs/feeds/'
+          commit_message: 'feat(cms): sync lab status and SIEM feeds'
