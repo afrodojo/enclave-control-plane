@@ -1,22 +1,24 @@
+cat << 'EOF' > playbooks/app_deploy.yml
 ---
 - name: Deploy and Harden Application Enclave Services
   hosts: enclave
   become: yes
   tasks:
+
     # Node 1: Ingress Gateway Configuration
-    - name: Ensure Nginx is runnin on Ingress (Node 1)
+    - name: Ensure Nginx is running on Ingress (Node 1)
       systemd:
         name: nginx
         state: started
         enabled: yes
-       when: inventory_hostname == 'node1'
+      when: inventory_hostname == 'node1'
 
-    -name: Verify Nginx firewall port 80/tcp open
-     firewalld:
-       port: 80/tcp
-       permanent: yes
-       state: enabled
-       immediate: yes
+    - name: Verify Nginx firewall port 80/tcp open
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
       when: inventory_hostname == 'node1'
 
     # Node 2: Ollama Inference Engine Configuration
@@ -27,13 +29,13 @@
         enabled: yes
       when: inventory_hostname == 'node2'
 
-    -name: Verify Ollama firewall port 11434/tcp open
-     firewalld:
-       rich_rule: 'rule family="ipv4" source address="10.0.10.0/24" port port="11434" protocol="tcp" accept'
-       permanent: yes
-       state: enabled
-       immediate: yes
-     when: inventory_hostname == 'node2'
+    - name: Verify Ollama firewall port 11434/tcp open
+      firewalld:
+        rich_rule: 'rule family="ipv4" source address="10.0.10.0/24" port port="11434" protocol="tcp" accept'
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: inventory_hostname == 'node2'
 
     # Node 3: Vault Secrets Service Configuration
     - name: Ensure Vault service port 8200/tcp is open in firewalld
@@ -43,3 +45,4 @@
         state: enabled
         immediate: yes
       when: inventory_hostname == 'node3'
+EOF
