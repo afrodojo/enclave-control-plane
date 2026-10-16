@@ -1,0 +1,13 @@
+#!/bin/bash
+# Pre-commit hook: Sovereign Identity Guardrail
+AUTHORIZED_EMAIL="dassenseibsu@pm.me"
+COMMITTER_EMAIL=$(git config user.email)
+
+if [ "$COMMITTER_EMAIL" != "$AUTHORIZED_EMAIL" ]; then
+    echo "[SECURITY VIOLATION] Unauthorized commit attempt by: '$COMMITTER_EMAIL'"
+    echo "Commits are strictly restricted to sovereign maintainer: Asaad Morman ($AUTHORIZED_EMAIL)"
+    exit 1
+fi
+
+echo "[GUARDRAIL PASS] Verified sovereign commit author: Asaad Morman ($COMMITTER_EMAIL)"
+exit 0
