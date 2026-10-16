@@ -13,7 +13,7 @@
       when: inventory_hostname == 'node1'
 
     - name: Verify Nginx firewall port 80/tcp open
-      firewalld:
+      ansible.posix.firewalld:
         port: 80/tcp
         permanent: yes
         state: enabled
@@ -29,7 +29,7 @@
       when: inventory_hostname == 'node2'
 
     - name: Verify Ollama firewall port 11434/tcp open
-      firewalld:
+      ansible.posix.firewalld:
         rich_rule: 'rule family="ipv4" source address="10.0.10.0/24" port port="11434" protocol="tcp" accept'
         permanent: yes
         state: enabled
@@ -38,7 +38,7 @@
 
     # Node 3: Vault Secrets Service Configuration
     - name: Ensure Vault service port 8200/tcp is open in firewalld
-      firewalld:
+      ansible.posix.firewalld:
         port: 8200/tcp
         permanent: yes
         state: enabled
