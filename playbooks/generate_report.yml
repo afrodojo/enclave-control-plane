@@ -12,8 +12,16 @@
         - ollama
         - firewalld
 
+    - name: Ensure reports directory exists on Node 0
+      delegate_to: localhost
+      run_once: true
+      file:
+        path: /root/repo/enclave-control-plane/reports
+        state: directory
+        mode: '0755'
+
     - name: Output JSON Status Artifact
       delegate_to: localhost
       copy:
         content: "{{ ansible_facts | to_nice_json }}"
-        destination: "../reports/telemetry-{{ inventory_hostname }}.json"
+        dest: "/root/repo/enclave-control-plane/reports/telemetry-{{ inventory_hostname }}.json"
