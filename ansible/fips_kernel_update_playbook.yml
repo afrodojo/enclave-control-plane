@@ -1,0 +1,100 @@
+---
+- name: Hardening & FIPS 140-3 Upgrade Playbook for EDS-360 Enclave Nodes
+  hosts: all
+  become: yes
+  vars:
+    fips_proc_path: "/proc/sys/crypto/fips_enabled"
+
+  tasks:
+    - name: 1. Ensure required FIPS and crypto utility packages are installed
+      ansible.builtin.dnf:
+        name:
+          - crypto-policies
+          - crypto-policies-scripts
+          - dracut-fips
+          - pam_yubico
+          - pam_pkcs11
+          - opensc
+        state: present
+
+    - name: 2. Configure GRUB to enable kernel FIPS mode (fips=1)
+      ansible.builtin.replace:
+        path: /etc/default/grub
+        regexp: '^(GRUB_CMDLINE_LINUX="(?!.*fips=1).*)"$'
+        replace: '\1 fips=1"'
+      notify:
+        - Rebuild GRUB config
+        - Regenerate initramfs
+
+    - name: 3. Enable FIPS system crypto policy
+      ansible.builtin.command:
+        cmd: fips-mode-setup --enable
+      register: fips_setup_result
+      changed_when: "'FIPS mode will be enabled' in fips_setup_result.stdout or 'System is already in FIPS mode' not in fips_setup_result.stdout"
+      failed_when: false
+
+    - name: 4. Force system-wide crypto policy to FIPS
+      ansible.builtin.command:
+        cmd: update-crypto-policies --set FIPS
+      changed_when: false
+
+    - name: 5. Configure OpenSSL 3.x FIPS Provider in /etc/ssl/openssl.cnf
+      ansible.builtin.blockinfile:
+        path: /etc/ssl/openssl.cnf
+        marker: "# {mark} ANSIBLE MANAGED FIPS PROVIDER BLOCK"
+        block: |
+          [openssl_init]
+          providers = provider_sect
+
+          [provider_sect]
+          fips = fips_sect
+          base = base_sect
+
+          [fips_sect]
+          activate = 1
+
+    - name: 6. Apply DISA STIG OpenSSH Hardening Drop-in Config
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/50-disa-stig.conf
+        content: |
+          # DISA STIG & CMMC Level 2 OpenSSH Hardening
+          PermitRootLogin no
+          PasswordAuthentication no
+          AuthenticationMethods publickey,keyboard-interactive:pam
+          ClientAliveInterval 900
+          ClientAliveCountMax 0
+          Ciphers aes256-gcm@openssh.com,aes256-ctr
+          KexAlgorithms ecdh-sha2-nistp384,ecdh-sha2-nistp521
+          MACs hmac-sha2-512-etm@openssh.com
+          Banner /etc/issue
+          X11Forwarding no
+          AllowTcpForwarding no
+          MaxAuthTries 3
+        owner: root
+        group: root
+        mode: '0600'
+      notify: Restart sshd
+
+    - name: 7. Verify kernel FIPS flag status
+      ansible.builtin.command:
+        cmd: cat /proc/sys/crypto/fips_enabled
+      register: fips_flag
+      changed_when: false
+
+    - name: Display FIPS mode status
+      ansible.builtin.debug:
+        msg: "Kernel FIPS Status: {{ fips_flag.stdout }}"
+
+  handlers:
+    - name: Rebuild GRUB config
+      ansible.builtin.command:
+        cmd: grub2-mkconfig -o /boot/grub2/grub.cfg
+
+    - name: Regenerate initramfs
+      ansible.builtin.command:
+        cmd: dracut -f --regenerate-all
+
+    - name: Restart sshd
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
