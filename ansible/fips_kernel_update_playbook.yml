@@ -45,8 +45,9 @@
           # DISA STIG & CMMC Level 2 OpenSSH Hardening
           PermitRootLogin no
           PasswordAuthentication no
+          PubkeyAuthentication yes
           KbdInteractiveAuthentication yes
-          AuthenticationMethods publickey,keyboard-interactive:pam
+          AuthenticationMethods publickey
           ClientAliveInterval 900
           ClientAliveCountMax 0
           Ciphers aes256-gcm@openssh.com,aes256-ctr
