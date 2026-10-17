@@ -38,7 +38,7 @@
         cmd: update-crypto-policies --set FIPS
       changed_when: false
 
-   - name: 5. Apply DISA STIG OpenSSH Hardening Drop-in Config
+    - name: 5. Apply DISA STIG OpenSSH Hardening Drop-in Config
       ansible.builtin.copy:
         dest: /etc/ssh/sshd_config.d/50-disa-stig.conf
         content: |
