@@ -6,7 +6,13 @@
     fips_proc_path: "/proc/sys/crypto/fips_enabled"
 
   tasks:
-    - name: 1. Ensure required FIPS and crypto utility packages are installed
+    - name: 1a. Ensure EPEL repository is installed and enabled
+      ansible.builtin.dnf:
+        name: epel-release
+        state: present
+      ignore_errors: yes
+
+    - name: 1b. Ensure required FIPS and crypto utility packages are installed
       ansible.builtin.dnf:
         name:
           - crypto-policies
@@ -16,6 +22,8 @@
           - pam_pkcs11
           - opensc
         state: present
+        enablerepo: epel
+      ignore_errors: yes
 
     - name: 2. Configure GRUB to enable kernel FIPS mode (fips=1)
       ansible.builtin.replace:
