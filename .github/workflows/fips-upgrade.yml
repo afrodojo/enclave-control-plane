@@ -1,0 +1,48 @@
+```
+name: FIPS 140-3 Enclave Upgrade &amp; Verification
+
+on:
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+    inputs:
+      target_phase:
+        description: 'Select deployment phase'
+        required: true
+        default: 'phase1'
+        type: choice
+        options:
+          - phase1          # Node 0 &amp; Node 1
+          - phase2          # Nodes 2, 3 &amp; 4
+          - all             # All Nodes
+
+jobs:
+  ansible-upgrade:
+    runs-on: self-hosted # Run directly on vm-node0 inside 10.0.10.0/24
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Python &amp; Ansible
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install ansible pypdf reportlab
+
+      - name: Execute FIPS Upgrade Playbook (${{ github.event.inputs.target_phase }})
+        env:
+          ANSIBLE_SUDO_PASS: ${{ secrets.ANSIBLE_SUDO_PASS }}
+        run: |
+          ansible-playbook -i ansible/inventory.ini ansible/fips_kernel_update_playbook.yml \
+            --limit ${{ github.event.inputs.target_phase }} \
+            --extra-vars "ansible_sudo_pass=$ANSIBLE_SUDO_PASS"
+
+      - name: Verify FIPS Kernel Mode Status
+        run: |
+          ansible -i ansible/inventory.ini ${{ github.event.inputs.target_phase }} \
+            -m shell -a "fips-mode-setup --check" \
+            --extra-vars "ansible_sudo_pass=${{ secrets.ANSIBLE_SUDO_PASS }}"
+
+      - name: Generate 3PAO Body of Evidence Audit Report
+        if: github.event.inputs.target_phase == 'phase2' || github.event.inputs.target_phase == 'all'
+        run: |
+          python3 scripts/fips1403_validator.py
+
+```
